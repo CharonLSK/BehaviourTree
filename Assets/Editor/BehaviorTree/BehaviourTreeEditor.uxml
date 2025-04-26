@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/BehaviorTree/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=3386c01e3296fff4ea44d3975df40633&amp;type=3#BehaviourTreeEditor" />
+    <uie:Toolbar>
+        <uie:ToolbarMenu display-tooltip-when-elided="true" />
+    </uie:Toolbar>
+    <SplitView name="SplitView" fixed-pane-initial-dimension="300" style="flex-grow: 1;">
+        <ui:VisualElement name="left_panel" style="width: 275px; flex-grow: 0; height: auto;">
+            <SplitView orientation="Vertical" fixed-pane-initial-dimension="415">
+                <ui:VisualElement name="inspector">
+                    <ui:Label text="Inspector" display-tooltip-when-elided="true" style="background-color: rgb(40, 40, 40);" />
+                    <InspectorView name="InspectorView" />
+                </ui:VisualElement>
+                <ui:VisualElement name="blackboard" style="flex-direction: column;">
+                    <ui:VisualElement name="createPanel" style="flex-direction: row; padding-right: 0; flex-shrink: 1; flex-basis: auto; border-right-width: 10px;">
+                        <ui:TextField picking-mode="Ignore" label="Name" value="filler text" name="valName" style="width: 39%; height: auto; flex-direction: column; -unity-text-align: middle-left;" />
+                        <ui:DropdownField label="Type" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="valType" style="width: 39%; flex-direction: column;" />
+                        <ui:Button text="Add" display-tooltip-when-elided="true" name="addBtn" style="width: 19%; height: 50%; -unity-text-align: middle-center; justify-content: flex-start; align-items: stretch; left: 0; top: 47%;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="valListTitle" style="flex-direction: row; padding-right: 0; flex-shrink: 1; flex-basis: auto;">
+                        <ui:Label text="Name" display-tooltip-when-elided="true" name="valName" style="width: 39%; padding-right: 0; border-right-width: 0; border-left-color: rgb(42, 42, 42); border-right-color: rgb(42, 42, 42); border-top-color: rgb(42, 42, 42); border-bottom-color: rgb(42, 42, 42); -unity-text-align: middle-left;" />
+                        <ui:Label text=" Value" display-tooltip-when-elided="true" name="Value" style="width: 40%; align-items: stretch; -unity-text-align: upper-left; border-left-width: 0; border-left-color: rgb(101, 101, 101); border-right-color: rgb(101, 101, 101); border-top-color: rgb(101, 101, 101); border-bottom-color: rgb(101, 101, 101);" />
+                        <ui:Button text="Delete" display-tooltip-when-elided="true" name="delBtn" style="width: 19%; background-color: rgb(60, 60, 60); -unity-text-align: middle-center;" />
+                    </ui:VisualElement>
+                    <ui:ListView focusable="true" name="ValueList" />
+                </ui:VisualElement>
+            </SplitView>
+        </ui:VisualElement>
+        <ui:VisualElement name="right_panel" style="flex-grow: 1; height: auto;">
+            <ui:Label text="TreeView" display-tooltip-when-elided="true" />
+            <BehaviourTreeView focusable="true" name="BehaviourTreeView" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </SplitView>
+</ui:UXML>
