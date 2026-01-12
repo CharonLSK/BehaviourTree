@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement style="flex-direction: row; border-bottom-width: 1px; border-left-color: rgba(70, 70, 70, 255); border-right-color: rgba(70, 70, 70, 255); border-top-color: rgba(70, 70, 70, 255); border-bottom-color: rgba(70, 70, 70, 255);">
+    <ui:VisualElement style="flex-direction: row; border-bottom-width: 1px; border-left-color: rgb(70, 70, 70); border-right-color: rgb(70, 70, 70); border-top-color: rgb(70, 70, 70); border-bottom-color: rgb(70, 70, 70);">
         <ui:Label text="Label" display-tooltip-when-elided="true" name="ValueName" style="width: 39%;" />
-        <uie:PropertyField name="Value" style="width: 60%;" />
+        <ui:VisualElement name="filedRoot" style="height: auto; width: 60%;" />
     </ui:VisualElement>
 </ui:UXML>

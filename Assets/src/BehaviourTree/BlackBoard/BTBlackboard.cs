@@ -1,121 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-
-#if UNITY_EDITOR
-using System.IO;
-using UnityEditor;
-#endif
-
 
 public class BTBlackboard : ScriptableObject
 {
-    public Dictionary<string, BTBlackBoardValSOBase> valuesDic;
-    public List<BTBlackBoardValSOBase> values = new List<BTBlackBoardValSOBase>();
+    [SerializeReference] private List<BT_BbDataBase> values;
+    private Dictionary<string, BT_BbDataBase> valuesDic;
 
-    
-    public T GetValue<T>(string key) where T:BTBlackBoardValSOBase
+    /// <summary>只读访问黑板条目列表</summary>
+    public List<BT_BbDataBase> Values => values;
+
+    private void OnEnable()
     {
-        if (valuesDic == null) FlashValueDic();
-        if (valuesDic.TryGetValue(key, out var v))
-            return v as T;
-        return null;
+        if (values == null)
+        {
+            values = new List<BT_BbDataBase>();
+        }
+        RebuildDic();
     }
 
-    public bool SetValue<U>(string key, U value)
+    public T GetValue<T>(string key) where T : BT_BbDataBase
     {
-        var val = GetValue<BTBlackBoardValSO<U>>(key);
-        if (val == null) return false;
-        val.value = value;
-#if UNITY_EDITOR
-        EditorUtility.SetDirty(val);
-        EditorUtility.SetDirty(this);
-        AssetDatabase.SaveAssets();
-#endif
+        if (valuesDic == null)
+            RebuildDic();
+        valuesDic.TryGetValue(key, out var entry);
+        return entry as T;
+    }
+
+    public bool SetValue<U>(string key, U newValue)
+    {
+        var entry = GetValue<BT_BbData<U>>(key);
+        if (entry == null) return false;
+        entry.value = newValue;
         return true;
     }
 
-    public void AddValue(string key, Type valueType)
+    public BT_BbDataBase GetValueByIdx(int idx)
     {
-        if (string.IsNullOrEmpty(key) || key.Equals("None"))
-        {
-            return;
-        }
-        string newKey = new string(
-            key.ToCharArray().Where(c => !Char.IsWhiteSpace(c)).ToArray()
-        );
-        if (valuesDic == null) FlashValueDic();
-        if (valuesDic.ContainsKey(key))
-        {
-            Debug.LogWarning($"value {key} is already exists");
-            return;
-        }
-
-        var value = (BTBlackBoardValSOBase) ScriptableObject.CreateInstance(valueType);
-        value.name = "Value_" + valueType.ToString() + "_" + newKey ;
-        value.key = newKey;
-        values.Add(value);
-        valuesDic.Add(newKey, value);
-
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
-            AssetDatabase.AddObjectToAsset(value, this);
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
-        }
-#endif
-    }
-    
-#if UNITY_EDITOR
-    public void SaveToAsset(string key)
-    {
-        if (Application.isPlaying) return;
-        if (valuesDic == null) FlashValueDic();
-        if (valuesDic.TryGetValue(key, out var val))
-        {
-            EditorUtility.SetDirty(val);
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
-        }
-    }
-#endif
-    public void DeleteValue(string key)
-    {
-        Debug.Log(" run delete value ,key is " + key);
-         BTBlackBoardValSOBase val;
-         if (valuesDic == null) FlashValueDic();
-         valuesDic.TryGetValue(key, out val);
-        if (val)
-        {
-            values.Remove(val);
-            valuesDic.Remove(key);
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                AssetDatabase.RemoveObjectFromAsset(val);
-                EditorUtility.SetDirty(this);
-                AssetDatabase.SaveAssets();
-            }
-#endif
-        }
+        if (idx < 0 || idx >= values.Count)
+            return null;
+        return values[idx];
     }
 
     public BTBlackboard Clone()
     {
-        BTBlackboard bb = Instantiate(this);
-        bb.values = values.ConvertAll(so => so.Clone());
-        return bb;
+        var clone = Instantiate(this);
+        clone.values = values.ConvertAll(v => v.Clone());
+        clone.RebuildDic();
+        return clone;
     }
-    
-    public void FlashValueDic()
+
+    public void RebuildDic()
     {
         if (valuesDic == null)
-            valuesDic = new Dictionary<string, BTBlackBoardValSOBase>();
-        else 
+            valuesDic = new Dictionary<string, BT_BbDataBase>();
+        else
             valuesDic.Clear();
-        values.ForEach(n => { valuesDic.Add(n.key, n);});
+
+        foreach (var entry in values)
+        {
+            if (!string.IsNullOrEmpty(entry.key))
+                valuesDic[entry.key] = entry;
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Text;
+using PlasticGui.Help;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
@@ -49,6 +50,10 @@ public class NodeView : UnityEditor.Experimental.GraphView.Node
         {
             AddToClassList("Root");
         }
+        else if (btNode is ConditionNode)
+        {
+            AddToClassList("Condition");
+        }
     }
     private void CreateInputPorts()
     {
@@ -69,6 +74,11 @@ public class NodeView : UnityEditor.Experimental.GraphView.Node
         }
         else if (btNode is RootBtNode)
         {
+        }
+        else if (btNode is ConditionNode)
+        {
+            inputPort = InstantiatePort(Orientation.Vertical, Direction.Input,
+                Port.Capacity.Single, typeof(bool));
         }
         if (inputPort != null)
         {
@@ -157,16 +167,16 @@ public class NodeView : UnityEditor.Experimental.GraphView.Node
         RemoveFromClassList("Success");
         RemoveFromClassList("Running");
 
-        switch (btNode.state)
+        switch (btNode.btNodeState)
         {
-            case BTNode.State.Running:
+            case BTNode.BTNodeState.Running:
                 if (btNode.started) 
                     AddToClassList("Running");  
                 break;
-            case BTNode.State.Failure:
+            case BTNode.BTNodeState.Failure:
                 AddToClassList("Failure");
                 break;
-            case BTNode.State.Success:
+            case BTNode.BTNodeState.Success:
                 AddToClassList("Success");
                 break;
         }

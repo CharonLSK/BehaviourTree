@@ -60,6 +60,7 @@ public class BehaviourTreeView : GraphView
             EditorUtility.SetDirty(tree);
             AssetDatabase.SaveAssets();
         }
+
         
         //创建node
         tree.allNode.ForEach(n => CreateNodeView(n));
@@ -77,14 +78,16 @@ public class BehaviourTreeView : GraphView
         });
         
         //创建blackboard
-        if (tree.btBlackboard)
+        if (tree.btBlackboard == null)
         {
-            if (blackboardView == null)
-            {
-                InitBlackboard();
-            }
-            blackboardView.FlashView();
+            behaviourTree.CreateBlackboard();
         }
+        if (blackboardView == null)
+        {
+            InitBlackboard();
+        }
+        blackboardView.FlashView();
+        
     }
     void InitBlackboard()
     {
@@ -98,12 +101,14 @@ public class BehaviourTreeView : GraphView
                                                endPort.node != startPort.node).ToList();
     }
 
+    //handle graph change event
     private GraphViewChange onGraphViewChanged(GraphViewChange graphviewchange)
     {
         int group = Undo.GetCurrentGroup();
         Undo.SetCurrentGroupName("Behaviour Tree Change");
         bool deleteFlag = false;
         List<Object> undoLst = new List<Object>();
+        //handle node or edge delete
         if (graphviewchange.elementsToRemove != null)
         {
             graphviewchange.elementsToRemove.ForEach(elem =>
@@ -114,7 +119,7 @@ public class BehaviourTreeView : GraphView
                     if (!deleteFlag)
                     {
                         deleteFlag = true;
-                        Undo.RecordObject(behaviourTree,"");
+                        Undo.RecordObject(behaviourTree, "node delete");
                     }
                     behaviourTree.DeleteNode(nodeView.btNode);
                 }
@@ -123,7 +128,7 @@ public class BehaviourTreeView : GraphView
                 {
                     NodeView parentView = edge.output.node as NodeView;
                     NodeView childView = edge.input.node as NodeView;
-                    Undo.RecordObject(parentView.btNode,"");
+                    Undo.RecordObject(parentView.btNode,"edge delete");
                     behaviourTree.RemoveChild(parentView.btNode, childView.btNode);
                 }
             });
@@ -138,55 +143,65 @@ public class BehaviourTreeView : GraphView
                 behaviourTree.AddChild(parentView.btNode, childView.btNode);
             });
         }
-
+        //handel node pos move, sort child lst
         if (graphviewchange.movedElements != null)
         {
-            behaviourTree.allNode.ForEach(n => { n.SortChildren(); });
+            behaviourTree.allNode.ForEach(n => { n.SortChildrenByX(); });
         }
         Undo.CollapseUndoOperations(group);
         EditorUtility.SetDirty(behaviourTree);
         return graphviewchange;
     }
 
+    //create mouse btn 1 click menu
     public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
     {
-
         {
             evt.menu.AppendAction($"Flash", (a) => { FlashView(behaviourTree);});
         }
-
+        
         Vector2 pos = contentViewContainer.WorldToLocal(evt.mousePosition);
+        //action node
         {
             var types = TypeCache.GetTypesDerivedFrom<ActionBtNode>();
             foreach (var type in types)
             {
-                evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, pos));
+                evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, pos));
             }
         }
-        
+        //composite
         {
             var types = TypeCache.GetTypesDerivedFrom<CompositeBtNode>();
             foreach (var type in types)
             {
-                evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, pos));
+                evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, pos));
             }
         }
-        
+        //decorator
         {
             var types = TypeCache.GetTypesDerivedFrom<DecoratorBtNode>();
             foreach (var type in types)
             {
-                evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (a) => CreateNode(type, pos));
+                evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, pos));
             }
         }
-        //blackboard
+        //condition
         {
-            evt.menu.AppendAction("Create Blackboard", (a) =>
+            var types = TypeCache.GetTypesDerivedFrom<ConditionNode>();
+            foreach (var type in types)
             {
-                behaviourTree.CreateBlackboard();
-                InitBlackboard();
-            });
+                evt.menu.AppendAction($"[{type.BaseType.Name}]/{type.Name}", (a) => CreateNode(type, pos));
+            }
         }
+
+        //blackboard 
+        // {
+        //     evt.menu.AppendAction("Create Blackboard", (a) =>
+        //     {
+        //         behaviourTree.CreateBlackboard();
+        //         InitBlackboard();
+        //     });
+        // }
     }
 
 

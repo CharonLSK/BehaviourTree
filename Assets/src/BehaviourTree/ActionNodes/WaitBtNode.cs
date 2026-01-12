@@ -10,15 +10,13 @@ public class WaitBtNode : ActionBtNode
         startTime = Time.time;
     }
 
-    protected override State OnUpdate()
+    protected override BTNodeState OnUpdate()
     {
         if (Time.time - startTime > duration)
         {
-            return State.Success;
+            return BTNodeState.Success;
         }
-
-        return State.Running;
-
+        return BTNodeState.Running;
     }
 
     protected override void OnStop()

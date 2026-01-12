@@ -1,16 +1,17 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/Editor/BehaviorTree/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=3386c01e3296fff4ea44d3975df40633&amp;type=3#BehaviourTreeEditor" />
     <uie:Toolbar>
-        <uie:ToolbarMenu display-tooltip-when-elided="true" />
+        <uie:ObjectField label="select tree" name="treeSelector" />
     </uie:Toolbar>
     <SplitView name="SplitView" fixed-pane-initial-dimension="300" style="flex-grow: 1;">
         <ui:VisualElement name="left_panel" style="width: 275px; flex-grow: 0; height: auto;">
             <SplitView orientation="Vertical" fixed-pane-initial-dimension="415">
-                <ui:VisualElement name="inspector">
+                <ui:VisualElement name="inspector" style="height: 458px;">
                     <ui:Label text="Inspector" display-tooltip-when-elided="true" style="background-color: rgb(40, 40, 40);" />
-                    <InspectorView name="InspectorView" />
+                    <BTEditorInspectorView />
                 </ui:VisualElement>
                 <ui:VisualElement name="blackboard" style="flex-direction: column;">
+                    <ui:Label text="Blackboard" display-tooltip-when-elided="true" style="background-color: rgb(40, 40, 40); margin-top: 0;" />
                     <ui:VisualElement name="createPanel" style="flex-direction: row; padding-right: 0; flex-shrink: 1; flex-basis: auto; border-right-width: 10px;">
                         <ui:TextField picking-mode="Ignore" label="Name" value="filler text" name="valName" style="width: 39%; height: auto; flex-direction: column; -unity-text-align: middle-left;" />
                         <ui:DropdownField label="Type" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="valType" style="width: 39%; flex-direction: column;" />
@@ -26,7 +27,7 @@
             </SplitView>
         </ui:VisualElement>
         <ui:VisualElement name="right_panel" style="flex-grow: 1; height: auto;">
-            <ui:Label text="TreeView" display-tooltip-when-elided="true" />
+            <ui:Label text="TreeView" display-tooltip-when-elided="true" name="Label" style="background-color: rgb(40, 40, 40); margin-top: 0;" />
             <BehaviourTreeView focusable="true" name="BehaviourTreeView" style="flex-grow: 1;" />
         </ui:VisualElement>
     </SplitView>

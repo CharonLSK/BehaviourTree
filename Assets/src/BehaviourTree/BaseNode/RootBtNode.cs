@@ -1,25 +1,25 @@
 ﻿
 public class RootBtNode : BTNode
 {
-    public BTNode child;
+    public override AllowedChildCount ChildCntType => AllowedChildCount.Single;
+
     protected override void OnStart()
     {
         
     }
-
-    protected override State OnUpdate()
+    protected override BTNodeState OnUpdate()
     {
-        return child.Update();
+        return ChildrensList[0].Update();
     }
-
     protected override void OnStop()
     {
+        
     }
 
     public override BTNode Clone()
     {
         RootBtNode btNode = Instantiate(this);
-        btNode.child = child.Clone();
+        btNode.ChildrensList = ChildrensList.ConvertAll(child => { return child.Clone(); });
         return btNode;
     }
 }

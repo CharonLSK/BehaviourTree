@@ -9,6 +9,7 @@ public class BehaviourTreeRunner : MonoBehaviour
     private void Start()
     {
         tree = tree.Clone();
+        tree.Active(this.gameObject);
     }
 
     private void Update()

@@ -1,21 +1,22 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 public class DebugLogBtNode : ActionBtNode
 {
+    public string dicName;
     public string message;
     protected override void OnStart()
     {
-        Debug.Log($"onStart: {message}");
+        message = btBlackboard.GetValue<BtStringVal>(dicName).value;
     }
 
-    protected override State OnUpdate()
+    protected override BTNodeState OnUpdate()
     {
         Debug.Log($"OnUpdate: {message}");
-        return State.Success;
+        return BTNodeState.Success;
     }
 
     protected override void OnStop()
     {
-        Debug.Log($"OnStop: {message}");
     }
 }

@@ -41,7 +41,7 @@ public class BlackBoardView
     
     private void AddValue()
     {
-        blackboard.AddValue(valueNameText.text, valueTypes[valueTypeDrop.index]);
+        BTBlackboardEditorUtility.AddValue(blackboard, valueNameText.text, valueTypes[valueTypeDrop.index]);
         valuesListView.Rebuild();
     }
 
@@ -49,9 +49,8 @@ public class BlackBoardView
     {
         if (!blackboard) return;
         if (valuesListView.selectedItem == null) return;
-        string key = (valuesListView.selectedItem as BTBlackBoardValSOBase).key;
-        blackboard.DeleteValue(key);
-        valuesListView.itemsSource = blackboard.values;
+        string key = (valuesListView.selectedItem as BT_BbDataBase).key;
+        BTBlackboardEditorUtility.DeleteValue(blackboard, key);
         valuesListView.Rebuild();
     }
 
@@ -73,32 +72,135 @@ public class BlackBoardView
         };
         valuesListView.bindItem = (item, index) =>
         {
-            item.Q<Label>("ValueName").text = blackboard.values[index].key;
-            var value = blackboard.values[index];
-            SerializedObject serializedObject = new SerializedObject(value);
-            SerializedProperty property = serializedObject.FindProperty("value");
-            PropertyField propertyField = item.Q<PropertyField>();
-            propertyField.label = "";
-            propertyField.BindProperty(property);
-            propertyField.Bind(serializedObject);
-            propertyField.RegisterValueChangeCallback((evt)=>
+            var dataBase = blackboard.GetValueByIdx(index);
+            item.Q<Label>("ValueName").text = String.Format("{0}_({1})", dataBase.key, dataBase.valType.ToString());
+            VisualElement fieldElement = null;
+            void dataChangeFailure(BT_BbDataBase dataBase)
             {
-                OnValueChangedCallback(evt, value.key);
-            });
+                Debug.LogWarning($"类型转换错误，请检查类型设置。对象名称： {dataBase.key},  设置类型：{dataBase.valType.ToString()} ");
+            }
+            switch (dataBase.valType)
+            {
+                case BT_BbDataBase.BTValType.tInt:
+                    BtIntVal iData = dataBase as BtIntVal;
+                    IntegerField intFiled = new IntegerField();
+                    fieldElement  = intFiled;
+                    if (iData == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    intFiled.value = iData.value;
+                    intFiled.RegisterValueChangedCallback(evt =>
+                    {
+                        iData.value = evt.newValue;
+                        OnValueChangedCallback();
+                    });
+                    break;
+                case BT_BbDataBase.BTValType.tFloat:
+                    BtFloatVal fData = dataBase as BtFloatVal;
+                    FloatField floatFiled = new FloatField();
+                    fieldElement  = floatFiled;
+                    if (fData == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    floatFiled.value = fData.value;
+                    floatFiled.RegisterValueChangedCallback(evt =>
+                    {
+                        fData.value = evt.newValue;
+                        OnValueChangedCallback();
+                    });
+                    break;
+                case BT_BbDataBase.BTValType.tBool:
+                    BtBoolVal bData = dataBase as BtBoolVal;
+                    if (bData == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    var toggle = new Toggle();
+                    toggle.value = bData.value;
+                    toggle.RegisterValueChangedCallback(evt =>
+                    {
+                        bData.value = evt.newValue;
+                        OnValueChangedCallback();
+                    });
+                    fieldElement  = toggle;
+                    break;
+                case BT_BbDataBase.BTValType.tString:
+                    BtStringVal strData = dataBase as BtStringVal;
+                    if (strData == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    var textFeild = new TextField();
+                    textFeild.value = strData.value;
+                    textFeild.RegisterValueChangedCallback(evt =>
+                    {
+                        strData.value = evt.newValue;
+                        OnValueChangedCallback();
+                    });
+                    fieldElement  = textFeild;
+                    break;
+                case BT_BbDataBase.BTValType.tTrans:
+                    BtTransformVal transData = dataBase as BtTransformVal;
+                    if (transData == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    var transField = new ObjectField();
+                    transField.objectType = typeof(Transform);
+                    transField.allowSceneObjects = true;
+                    transField.value = transData.value;
+                    transField.RegisterValueChangedCallback(evt =>
+                    {
+                        transData.value = evt.newValue as Transform;
+                        OnValueChangedCallback();
+                    });
+                    fieldElement  = transField;
+                    break;
+                case BT_BbDataBase.BTValType.tVector3:
+                    BtVector3Val v3Data = dataBase as BtVector3Val;
+                    if (v3Data == null)
+                    {
+                        dataChangeFailure(dataBase);
+                        break;
+                    }
+                    Vector3Field vector3Field = new Vector3Field();
+                    vector3Field.value = v3Data.value;
+                    vector3Field.RegisterValueChangedCallback(evt =>
+                    {
+                        v3Data.value = evt.newValue;
+                        OnValueChangedCallback();
+                    });
+                    fieldElement  = vector3Field;
+                    break;
+                
+            }
+            VisualElement fieldRoot = item.Q<VisualElement>("filedRoot");
+            if (fieldElement == null)
+            {
+                fieldElement  = new Label("不支持类型");
+            }
+            fieldRoot.Add(fieldElement);
         };
-        valuesListView.itemsSource = blackboard.values;
+        valuesListView.itemsSource = blackboard.Values;
     }
 
-    private void OnValueChangedCallback(SerializedPropertyChangeEvent evt,string key)
+    private void OnValueChangedCallback()
     {
-        blackboard.SaveToAsset(key);
+        BTBlackboardEditorUtility.SaveAll(blackboard);
     }
 
     private void UpdateValueTypeSelector()
     {
         valueTypes.Clear();
         valueTypeDrop.choices.Clear();
-        BlackboardTools.GetAllChildValueType().ForEach(type =>
+        BTBlackboardEditorUtility.GetAllChildValueType().ForEach(type =>
         {
             valueTypes.Add(type);
             valueTypeDrop.choices.Add(type.Name);

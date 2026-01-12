@@ -1,9 +1,9 @@
 #node-border {
-    background-color: rgba(56, 56, 56, 255);
-    border-left-color: rgba(0, 0, 0, 255);
-    border-right-color: rgba(0, 0, 0, 255);
-    border-top-color: rgba(0, 0, 0, 255);
-    border-bottom-color: rgba(0, 0, 0, 255);
+    background-color: rgb(56, 56, 56);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
     border-top-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
@@ -23,10 +23,10 @@
 }
 
 #selection-border {
-    border-left-color: rgba(108, 193, 252, 255);
-    border-right-color: rgba(108, 193, 252, 255);
-    border-top-color: rgba(108, 193, 252, 255);
-    border-bottom-color: rgba(108, 193, 252, 255);
+    border-left-color: rgb(108, 193, 252);
+    border-right-color: rgb(108, 193, 252);
+    border-top-color: rgb(108, 193, 252);
+    border-bottom-color: rgb(108, 193, 252);
     border-top-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
@@ -77,11 +77,11 @@
 #divider {
     height: 1px;
     color: rgb(128, 128, 128);
-    background-color: rgba(82, 82, 82, 255);
+    background-color: rgb(82, 82, 82);
 }
 
 .Action #input {
-    background-color: rgba(152, 205, 0, 255);
+    background-color: rgb(152, 205, 0);
 }
 
 .Root #input {
@@ -102,10 +102,10 @@
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
-    border-left-color: rgba(236, 136, 8, 255);
-    border-right-color: rgba(236, 136, 8, 255);
-    border-top-color: rgba(236, 136, 8, 255);
-    border-bottom-color: rgba(236, 136, 8, 255);
+    border-left-color: rgb(236, 136, 8);
+    border-right-color: rgb(236, 136, 8);
+    border-top-color: rgb(236, 136, 8);
+    border-bottom-color: rgb(236, 136, 8);
     position: absolute;
     left: 0;
     right: 0;
@@ -118,10 +118,10 @@
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
-    border-left-color: rgba(167, 248, 60, 255);
-    border-right-color: rgba(167, 248, 60, 255);
-    border-top-color: rgba(167, 248, 60, 255);
-    border-bottom-color: rgba(167, 248, 60, 255);
+    border-left-color: rgb(167, 248, 60);
+    border-right-color: rgb(167, 248, 60);
+    border-top-color: rgb(167, 248, 60);
+    border-bottom-color: rgb(167, 248, 60);
     position: absolute;
     left: 0;
     top: 0;
@@ -130,10 +130,10 @@
 }
 
 .Failure #state-border {
-    border-left-color: rgba(255, 0, 0, 255);
-    border-right-color: rgba(255, 0, 0, 255);
-    border-top-color: rgba(255, 0, 0, 255);
-    border-bottom-color: rgba(255, 0, 0, 255);
+    border-left-color: rgb(255, 0, 0);
+    border-right-color: rgb(255, 0, 0);
+    border-top-color: rgb(255, 0, 0);
+    border-bottom-color: rgb(255, 0, 0);
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
@@ -142,4 +142,8 @@
     left: 0;
     top: 0;
     right: 0;
+}
+
+.Condition #input {
+    background-color: rgb(255, 102, 218);
 }

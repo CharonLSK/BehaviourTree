@@ -3,23 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu()]
 public class BehaviourTree : ScriptableObject
 { 
     public BTNode rootBtNode;
-    public BTNode.State treeState = BTNode.State.Running;
+    public BTNode.BTNodeState treeBtNodeState = BTNode.BTNodeState.Running;
     public List<BTNode> allNode = new List<BTNode>(); 
     public BTBlackboard btBlackboard;
+    
+    public GameObject tarGameObj;
+    private bool isActive = false;
+    
 
-
-    public BTNode.State Update()
+    //TODO: blackboard data init from json
+    public void Active(GameObject obj)
     {
-        if (rootBtNode.state == BTNode.State.Running)
+        if (isActive) return;
+        isActive = true;
+        tarGameObj = obj;
+        allNode.ForEach(n => {n.Active(obj);});
+    }
+    
+    // public void Clear()
+    // {
+    //     isActive = false;
+    //     tarGameObj = null;
+    //     allNode.ForEach(n => {n.Clear();});
+    //
+    // }
+
+    public BTNode.BTNodeState Update()
+    {
+        if (rootBtNode.btNodeState == BTNode.BTNodeState.Running)
         {
-            treeState = rootBtNode.Update();
+            treeBtNodeState = rootBtNode.Update();
         }
-        return treeState;
+        return treeBtNodeState;
     }
 
     public void CreateBlackboard()
@@ -48,7 +69,6 @@ public class BehaviourTree : ScriptableObject
 
     public BTNode CreateNode(System.Type type)
     {
-        Debug.Log(type.Name);
         BTNode btNode = ScriptableObject.CreateInstance(type) as BTNode;
         btNode.name = type.Name;
         btNode.guid = GUID.Generate().ToString();
@@ -71,64 +91,24 @@ public class BehaviourTree : ScriptableObject
 
     public void AddChild(BTNode parent, BTNode child)
     {
-        DecoratorBtNode decoratorBt = parent as DecoratorBtNode;;
-        if (decoratorBt)
+        if (parent.ChildNodeCntToMax)
         {
-            decoratorBt.child = child;
-        }
-        
-        RootBtNode rootBtNode = parent as RootBtNode;;
-        if (rootBtNode)
-        {
-            rootBtNode.child = child;
+            Debug.LogWarning($"Node {parent.name} child cnt ");
+            return;
         }
 
-        CompositeBtNode compositeBt = parent as CompositeBtNode;
-        if (compositeBt)
-        {
-            compositeBt.children.Add(child);
-        }
+        parent.AddChild(child);
     }
 
     public void RemoveChild(BTNode parent, BTNode child)
     {
-        DecoratorBtNode decoratorBt = parent as DecoratorBtNode;;
-        if (decoratorBt)
-        {
-            decoratorBt.child = null;
-        }
-        CompositeBtNode compositeBt = parent as CompositeBtNode;
-        if (compositeBt)
-        {
-            compositeBt.children.Remove(child);
-        }
-        RootBtNode rootBtNode = parent as RootBtNode;;
-        if (rootBtNode)
-        {
-            rootBtNode.child = null;
-        }
+        parent.RemoveChild(child);
     }
     
     public List<BTNode> GetChildren(BTNode parent)
     {
-        List<BTNode> lst = new List<BTNode>();
-        DecoratorBtNode decoratorBt = parent as DecoratorBtNode;
-        if (decoratorBt && decoratorBt.child != null)
-        {
-            lst.Add(decoratorBt.child);
-        }
-        CompositeBtNode compositeBt = parent as CompositeBtNode;
-        if (compositeBt && compositeBt.children != null)
-        {
-            return compositeBt.children;
-        }
-        RootBtNode rootBtNode = parent as RootBtNode;;
-        if (rootBtNode && rootBtNode.child != null)
-        {
-            lst.Add(rootBtNode.child);
-        }
 
-        return lst;
+        return parent.GetChildrensList;
     }
 
     public void Traverse(BTNode node, System.Action<BTNode> visiter)
@@ -150,7 +130,7 @@ public class BehaviourTree : ScriptableObject
         if (btBlackboard)
         {   
             tree.btBlackboard = tree.btBlackboard.Clone();
-            tree.allNode.ForEach(n => { n.btBlackboard = btBlackboard;});
+            tree.allNode.ForEach(n => { n.btBlackboard = tree.btBlackboard;});
         }
         return tree;
     }
